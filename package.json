@@ -1,0 +1,13 @@
+{
+  "name": "pulsar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pulsar is a fullstack web application for Office Automation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["OA", "Office Automation", "pulsar"],
+  "author": "",
+  "license": "ISC"
+}
