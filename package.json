@@ -7,7 +7,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["OA", "Office Automation", "pulsar"],
+  "keywords": [
+    "OA",
+    "Office Automation",
+    "Pulsar",
+    "React 19",
+    "React-Router v7",
+    "Nest.js",
+    "TypeScript"
+  ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@xmry/utils": "^0.0.5",
+    "zod": "^3.24.1"
+  }
 }
