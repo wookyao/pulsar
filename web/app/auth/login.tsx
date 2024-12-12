@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { toast } from "react-hot-toast";
+import type { Route } from "../+types/root";
 import PulsarInput from "@/components/input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { validate } from "@xmry/utils";
-import { toast } from "react-hot-toast";
 
 let toastId: string | null = null;
 
@@ -84,6 +85,13 @@ function validateLoginParams(identity: string, password: string) {
   return {
     ok: true,
   };
+}
+
+export function meta({}: Route.MetaArgs) {
+  return [
+    { title: "Login - Pulsar OA" },
+    { name: "description", content: "欢迎使用Pulsar OA管理系统" },
+  ];
 }
 
 export default Login;

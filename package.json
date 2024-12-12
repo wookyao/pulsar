@@ -5,6 +5,7 @@
   "description": "Pulsar is a fullstack web application for Office Automation",
   "main": "index.js",
   "scripts": {
+    "start:dev": "pnpm -r --filter=@pulsar/* run start:dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
