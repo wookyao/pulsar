@@ -5,12 +5,23 @@ import PulsarInput from "@/components/input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { validate } from "@xmry/utils";
+import http from "@/helps/http";
 
 let toastId: string | null = null;
+
+
+const loginApi = async (identity: string, password: string) => {
+    http.post('/v1/login', { account:identity, password });
+};
+
 
 function Login() {
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
+
+  // 登录操作
+  
+
 
   const onSubmit = () => {
     const result = validateLoginParams(identity, password);
@@ -27,6 +38,8 @@ function Login() {
       });
       return;
     }
+
+    loginApi(identity, password);
   };
 
   return (
