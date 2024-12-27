@@ -20,13 +20,22 @@ export interface IPermission {
 export interface IRole {
   id: number
   name: string
-  permissions: IPermission[]
+  permissions?: IPermission[]
 }
 
 export interface IUser {
   id: number
   account: string
   status: IUserStatus
+  roles?: IRole[]
+}
+
+export interface IUserLoginResponse {
+  id: number
+  account: string
+  status: IUserStatus
   roles: IRole[]
+  token: string
+  perms: IPermission[]
 }
 

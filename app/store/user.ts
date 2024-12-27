@@ -1,30 +1,45 @@
-import type { IUser } from "@/types/auth";
+import type { IPermission, IUserLoginResponse } from "@/types/auth";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
+
+export interface UserInfoStore extends IUserLoginResponse {
+  treePerms: IPermission[],
+  permCodes: string[]
+}
+
 export interface UserState {
-  id: number;
-  account: string;
+  userInfo: UserInfoStore;
   token: string;
 }
 
 export interface UserActions {
-  setUserInfo: (userInfo: IUser) => void;
+  setUserInfo: (userInfo: UserInfoStore) => void;
   setToken: (token: string) => void;
   logout: () => void
+}
+
+const initialUserInfo: UserInfoStore = {
+  id: 0,
+  account: "",
+  status: 0,
+  roles: [],
+  token: "",
+  perms: [],
+  treePerms: [],
+  permCodes: []
 }
 
 const useUserStore = create<UserState & UserActions>()(
   persist(
     (set) => ({
-      id: 0,
-      account: "",
+      userInfo: initialUserInfo,
       token: "",
-      setUserInfo: (userInfo: IUser) =>
+
+      setUserInfo: (userInfo: UserInfoStore) =>
         set((state) => ({
           ...state,
-          id: userInfo.id,
-          account: userInfo.account,
+          userInfo,
         })),
       setToken: (token: string) =>
         set((state) => ({
@@ -34,8 +49,7 @@ const useUserStore = create<UserState & UserActions>()(
       logout: () =>
         set((state) => ({
           ...state,
-          id: 0,
-          account: "",
+          userInfo: initialUserInfo,
           token: "",
         })),
     }),

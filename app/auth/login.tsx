@@ -1,35 +1,42 @@
 import { useState } from "react";
-import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import type { Route } from "../+types/root";
 import PulsarInput from "@/components/input";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { validate } from "@xmry/utils";
 import http from "@/helps/http";
+import type { IPermission, IUserLoginResponse } from "@/types/auth";
+import useUserStore, { type UserInfoStore } from "@/store/user";
+import { arrayToTree } from "@/helps/flat2Tree";
+import useToast from "@/store/toast";
 
-let toastId: string | null = null;
 
 
 const loginApi = async (identity: string, password: string) => {
-    http.post('/v1/login', { account:identity, password });
+  const res: IUserLoginResponse = await http.post<IUserLoginResponse>('/v1/login', { account: identity, password }).catch((e) => {
+    console.log(e)
+    return e
+  });
+  return res;
 };
 
 
 function Login() {
+  const navigate = useNavigate()
+  const toast = useToast()
+
+  const userStore = useUserStore();
+
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
 
   // 登录操作
-  
-
-
-  const onSubmit = () => {
+  const onSubmit = async () => {
     const result = validateLoginParams(identity, password);
+
     if (!result.ok) {
-      if (toastId) {
-        toast.dismiss(toastId);
-      }
-      toastId = toast(result.message, {
+      toast.info(result.message as string, {
         style: {
           borderRadius: "30px",
           background: "#333",
@@ -39,7 +46,29 @@ function Login() {
       return;
     }
 
-    loginApi(identity, password);
+    const userInfo = await loginApi(identity, password);
+    console.log(userInfo)
+
+
+    const [url, treePerms] = getRedirectUrl(userInfo);
+
+    if (!url) {
+      toast.error("当前账号无任何权限，请联系管理员")
+      return
+    }
+
+    const userInfoStore: UserInfoStore = {
+      ...userInfo,
+      treePerms,
+      permCodes: [...new Set(userInfo.perms.map(item => item.code))]
+    }
+
+    userStore.setUserInfo(userInfoStore);
+    userStore.setToken(userInfo?.token ?? '');
+
+    toast.success('登录成功')
+
+    navigate(url, { replace: true })
   };
 
   return (
@@ -100,7 +129,32 @@ function validateLoginParams(identity: string, password: string) {
   };
 }
 
-export function meta({}: Route.MetaArgs) {
+function getRedirectUrl(userInfo: IUserLoginResponse): [string, IPermission[]] {
+  const treePerms = arrayToTree(userInfo.perms.sort((a, b) => a.sort! - b.sort!));
+
+  if (treePerms.length === 0) {
+    return ["", []]
+  }
+
+  const item = treePerms[0] as IPermission
+
+  function getUrl(item: IPermission) {
+
+    if (item.children?.length) {
+      return getUrl(item.children[0])
+    }
+
+    return item.path
+
+  }
+
+  const url = getUrl(item)
+
+
+  return [url, treePerms]
+}
+
+export function meta({ }: Route.MetaArgs) {
   return [
     { title: "Login - Pulsar OA" },
     { name: "description", content: "欢迎使用Pulsar OA管理系统" },

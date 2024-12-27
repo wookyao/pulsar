@@ -1,45 +1,45 @@
+import { LockKeyhole, LogOut, User } from "lucide-react";
+import { Link, Outlet, useNavigate } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@radix-ui/react-navigation-menu";
-import { LockKeyhole, LogOut, Settings, User } from "lucide-react";
-import { Link, Outlet } from "react-router";
 
-const navList = [
-  {
-    name: "首页",
-    path: "/dashboard",
-    key: "dashboard",
-  },
-  {
-    name: "审批发起",
-    path: "/approval-start",
-    key: "approvalStart",
-  },
-  {
-    name: "审批中心",
-    path: "/approval-center",
-    key: "approvalCenter",
-  },
-  {
-    name: "业务中心",
-    path: "/business",
-    key: "business",
-  },
-];
+} from "@/components/ui/popover";
+import http from "@/helps/http";
+import useToast from "@/store/toast";
+import useUserStore from "@/store/user";
+import type { IPermission } from "@/types/auth";
+
+
+
+const logoutApi = async () => {
+  const res = await http.post('/v1/user/logout').catch((e) => {
+    console.log(e)
+    return e
+  })
+  return res
+}
+
 
 const AppLayout = () => {
+
+  const userStore = useUserStore()
+  const toast = useToast()
+  const navigate = useNavigate()
+  const { userInfo } = userStore
+
+  const navList = getNavList(userInfo.treePerms)
+
+  const logout = async () => {
+    const res = await logoutApi()
+    userStore.logout()
+    toast.success('登出成功')
+    navigate('/login')
+  }
+
   return (
     <div className="h-screen w-screen bg-neutral-100">
       <div className="flex align-center h-16 px-4 bg-white">
@@ -66,14 +66,6 @@ const AppLayout = () => {
 
         {/* 右侧 用户头像和设置导航 */}
         <div className="ml-auto flex justify-end items-center gap-2">
-          <Link
-            to="/settings"
-            className="flex items-center gap-1 text-sm text-slate-600 hover:text-blue-500 transition-colors"
-          >
-            <Settings size={16} />
-            管理后台
-          </Link>
-
           <Popover>
             <PopoverTrigger asChild>
               <Avatar>
@@ -83,12 +75,19 @@ const AppLayout = () => {
             </PopoverTrigger>
             <PopoverContent className="w-60">
               <div className="text-md font-bold text-neutral-800 pb-4 flex flex-col px-2 ">
-                尼古拉斯 · 管理员
-                <p className="text-xs pt-1 font-normal text-neutral-500">
-                  wookyao15@gmail.com
-                </p>
+                {userInfo.account}
+
+                <div className="flex items-center gap-2 pt-2">
+                  {userInfo.roles.map((item) => (
+
+                    <>
+                      <span className="text-xs font-normal text-neutral-500">{item.name}</span>
+                    </>
+                  ))}
+                </div>
+
               </div>
-              <div className="text-sm cursor-pointer   flex items-center  justify-between gap-4">
+              <div className="text-sm cursor-pointer flex items-center  justify-between gap-4 border-t border-neutral-200 pt-2">
                 <div className="p-2 flex flex-col items-center  justify-center hover:bg-neutral-50 rounded-xl  gap-1">
                   <User size={18} />
                   用户
@@ -98,7 +97,7 @@ const AppLayout = () => {
                   修改密码
                 </div>
 
-                <div className="text-red-500 p-2 flex flex-col items-center justify-center hover:bg-neutral-50 rounded-xl gap-1">
+                <div className="text-red-500 p-2 flex flex-col items-center justify-center hover:bg-neutral-50 rounded-xl gap-1" onClick={logout}>
                   <LogOut size={18} />
                   登出
                 </div>
@@ -111,5 +110,22 @@ const AppLayout = () => {
     </div>
   );
 };
+
+function getNavList(treePerms: IPermission[]) {
+  const navList = []
+
+  for (const item of treePerms) {
+    if (item.type === 'MENU') {
+      navList.push({
+        name: item.name,
+        path: item.path,
+        key: item.code,
+        sort: item.sort
+      })
+    }
+  }
+
+  return navList.sort((a, b) => a.sort! - b.sort!)
+}
 
 export default AppLayout;

@@ -1,3 +1,4 @@
+import useUserStore from "@/store/user";
 import axios from "axios";
 import type {
   AxiosInstance,
@@ -6,6 +7,17 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
+import { toast } from "react-hot-toast";
+
+let toastId: string | null = null;
+
+
+function toastError(message: string) {
+  if (toastId) {
+    toast.dismiss(toastId)
+  }
+  toastId = toast.error(message)
+}
 
 // 创建请求实例
 const instance: AxiosInstance = axios.create({
@@ -19,8 +31,9 @@ const instance: AxiosInstance = axios.create({
 // 请求拦截器
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // 从 localStorage 获取 token
-    const token = localStorage.getItem("token");
+    // useUserStore 中获取 token
+    const token = useUserStore.getState().token || ""
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -40,9 +53,10 @@ instance.interceptors.response.use(
     }
 
     const { data } = response;
+    console.log(data, 'data');
 
     // 这里可以根据你的后端接口规范调整
-    if (data.code === 200) {
+    if (!data.code) {
       return data.data;
     }
 
@@ -51,30 +65,24 @@ instance.interceptors.response.use(
       code?: number;
     };
     error.code = data.code;
+
+
+    toastError(error.message)
+
+    if (data.code === 2000) {
+      window.location.href = "/login";
+    }
+
     return Promise.reject(error);
   },
   (error) => {
-    if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          // 未授权，清除 token 并跳转到登录页
-          localStorage.removeItem("token");
-          window.location.href = "/login";
-          break;
-        case 403:
-          // 权限不足
-          console.error("Permission denied");
-          break;
-        case 404:
-          console.error("API not found");
-          break;
-        case 500:
-          console.error("Server error");
-          break;
-        default:
-          console.error(`Error: ${error.message}`);
-      }
+
+    const data = error.response.data
+    if (data.message) toastError(data.message)
+    if (error.response.status === 401) {
+      window.location.href = "/login";
     }
+
     return Promise.reject(error);
   }
 );
