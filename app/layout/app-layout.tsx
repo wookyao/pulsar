@@ -1,5 +1,5 @@
 import { LockKeyhole, LogOut, User } from "lucide-react";
-import { Link, Outlet, useNavigate } from "react-router";
+import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
 import {
@@ -40,6 +40,9 @@ const AppLayout = () => {
     navigate('/login')
   }
 
+  // 获取当前路径
+  const pathname = useLocation().pathname
+
   return (
     <div className="h-screen w-screen bg-neutral-100">
       <div className="flex align-center h-16 px-4 bg-white">
@@ -58,6 +61,7 @@ const AppLayout = () => {
               key={item.key}
               to={item.path}
               className={navigationMenuTriggerStyle()}
+              data-active={pathname.startsWith(item.path) ? 'active' : ''}
             >
               {item.name}
             </Link>
@@ -107,7 +111,7 @@ const AppLayout = () => {
         </div>
       </div>
       <Outlet />
-    </div>
+    </div >
   );
 };
 
