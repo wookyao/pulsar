@@ -1,22 +1,22 @@
-import type { IPermission, IUserLoginResponse } from "@/types/auth";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
+import type { IPermission, IUserLoginResponse } from "@/types/auth";
 
 export interface UserInfoStore extends IUserLoginResponse {
-  treePerms: IPermission[],
-  permCodes: string[]
+  treePerms: IPermission[];
+  permCodes: string[];
 }
 
 export interface UserState {
   userInfo: UserInfoStore;
   token: string;
+  pathPerm: (pathname: string) => IPermission | undefined;
 }
 
 export interface UserActions {
   setUserInfo: (userInfo: UserInfoStore) => void;
   setToken: (token: string) => void;
-  logout: () => void
+  logout: () => void;
 }
 
 const initialUserInfo: UserInfoStore = {
@@ -27,14 +27,22 @@ const initialUserInfo: UserInfoStore = {
   token: "",
   perms: [],
   treePerms: [],
-  permCodes: []
-}
+  permCodes: [],
+};
 
 const useUserStore = create<UserState & UserActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       userInfo: initialUserInfo,
       token: "",
+      pathname: "",
+      pathPerm: (pathname: string) => {
+        const pathnameArr = pathname.split("/");
+        pathname = `/${pathnameArr[1]}`;
+
+        const state = get();
+        return state.userInfo.treePerms.find((perm) => perm.path === pathname);
+      },
 
       setUserInfo: (userInfo: UserInfoStore) =>
         set((state) => ({

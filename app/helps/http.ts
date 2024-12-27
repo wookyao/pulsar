@@ -11,12 +11,11 @@ import { toast } from "react-hot-toast";
 
 let toastId: string | null = null;
 
-
 function toastError(message: string) {
   if (toastId) {
-    toast.dismiss(toastId)
+    toast.dismiss(toastId);
   }
-  toastId = toast.error(message)
+  toastId = toast.error(message);
 }
 
 // 创建请求实例
@@ -32,7 +31,7 @@ const instance: AxiosInstance = axios.create({
 instance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     // useUserStore 中获取 token
-    const token = useUserStore.getState().token || ""
+    const token = useUserStore.getState().token || "";
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -53,7 +52,7 @@ instance.interceptors.response.use(
     }
 
     const { data } = response;
-    console.log(data, 'data');
+    console.log(data, "data");
 
     // 这里可以根据你的后端接口规范调整
     if (!data.code) {
@@ -66,8 +65,7 @@ instance.interceptors.response.use(
     };
     error.code = data.code;
 
-
-    toastError(error.message)
+    toastError(error.message);
 
     if (data.code === 2000) {
       window.location.href = "/login";
@@ -76,9 +74,8 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   },
   (error) => {
-
-    const data = error.response.data
-    if (data.message) toastError(data.message)
+    const data = error.response.data;
+    if (data.message) toastError(data.message);
     if (error.response.status === 401) {
       window.location.href = "/login";
     }
