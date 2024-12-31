@@ -1,7 +1,7 @@
-export type IPermissionType = 'MENU' | 'BUTTON';
+export type IPermissionType = "MENU" | "BUTTON";
 export type IUserStatus = 0 | 1 | 2;
 
-export interface IPermission {
+export type IPermission = {
   id: number;
   name: string;
   code: string;
@@ -17,20 +17,20 @@ export interface IPermission {
   children?: IPermission[];
 }
 
-export interface IRole {
+export type IRole = {
   id: number
   name: string
   permissions?: IPermission[]
 }
 
-export interface IUser {
+export type IUser = {
   id: number
   account: string
   status: IUserStatus
   roles?: IRole[]
 }
 
-export interface IUserLoginResponse {
+export type IUserLoginResponse = {
   id: number
   account: string
   status: IUserStatus
