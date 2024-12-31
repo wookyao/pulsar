@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ChevronRight, icons } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -13,7 +11,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import Pagination from "@/components/pagination";
 import Icon from "./index";
+import { useImmer } from "use-immer";
 
 export interface IconSelectProps {
   value?: string;
@@ -22,8 +22,11 @@ export interface IconSelectProps {
 
 const IconSelect = ({ value, onChange }: IconSelectProps) => {
   const [open, setOpen] = useState(false);
+  const pageSize = useRef(120);
 
   const [selectedValue, setSelectedValue] = useState<string>(value || "");
+
+  const [page, setPage] = useState(1);
 
   const handlerConfirm = () => {
     setOpen(false);
@@ -75,6 +78,11 @@ const IconSelect = ({ value, onChange }: IconSelectProps) => {
         </ScrollArea>
 
         <AlertDialogFooter>
+          <Pagination
+            total={Object.keys(icons).length}
+            page={page}
+            pageSize={pageSize.current}
+          />
           <Button variant="secondary" onClick={() => setOpen(false)}>
             取消
           </Button>
