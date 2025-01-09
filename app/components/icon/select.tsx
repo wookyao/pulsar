@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import { ChevronRight, icons } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -13,20 +12,27 @@ import {
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/pagination";
 import Icon from "./index";
-import { useImmer } from "use-immer";
 
 export interface IconSelectProps {
   value?: string;
   onChange?: (value: string) => void;
 }
 
+function pageIcons(page: number, pageSize: number) {
+  const start = (page - 1) * pageSize;
+  const end = start + pageSize;
+  return Object.keys(icons).slice(start, end);
+}
+
 const IconSelect = ({ value, onChange }: IconSelectProps) => {
   const [open, setOpen] = useState(false);
-  const pageSize = useRef(120);
+  const pageSize = useRef(80);
 
   const [selectedValue, setSelectedValue] = useState<string>(value || "");
-
   const [page, setPage] = useState(1);
+  const [iconList, setIconList] = useState<string[]>(pageIcons(page, pageSize.current));
+
+
 
   const handlerConfirm = () => {
     setOpen(false);
@@ -35,6 +41,7 @@ const IconSelect = ({ value, onChange }: IconSelectProps) => {
       onChange(selectedValue);
     }
   };
+
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -54,34 +61,35 @@ const IconSelect = ({ value, onChange }: IconSelectProps) => {
           <AlertDialogTitle>图标库</AlertDialogTitle>
           <AlertDialogDescription>请选择图标</AlertDialogDescription>
         </AlertDialogHeader>
-        <ScrollArea className="h-[400px] rounded-md p-4">
-          <div className="grid grid-cols-8">
-            {Object.keys(icons).map((key) => {
-              return (
-                <div
-                  className={`flex items-center justify-center px-2 py-4 cursor-pointer rounded-xl hover:bg-neutral-100 ${
-                    selectedValue === key
-                      ? "bg-neutral-300 hover:bg-neutral-300"
-                      : ""
+        <div className="grid grid-cols-10">
+          {iconList.map((key) => {
+            return (
+              <div
+                className={`flex items-center justify-center px-2 py-4 cursor-pointer rounded-xl hover:bg-neutral-100 ${selectedValue === key
+                  ? "bg-neutral-300 hover:bg-neutral-300"
+                  : ""
                   }`}
-                  key={key}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedValue(key);
-                  }}
-                >
-                  <Icon name={key} size={26} />
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
+                key={key}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedValue(key);
+                }}
+              >
+                <Icon name={key} size={26} />
+              </div>
+            );
+          })}
+        </div>
 
         <AlertDialogFooter>
           <Pagination
             total={Object.keys(icons).length}
             page={page}
             pageSize={pageSize.current}
+            onChange={(page) => {
+              setPage(page);
+              setIconList(pageIcons(page, pageSize.current));
+            }}
           />
           <Button variant="secondary" onClick={() => setOpen(false)}>
             取消

@@ -23,37 +23,37 @@ export interface PaginationProps {
 }
 
 const PaginationMemo = (props: PaginationProps) => {
-  const mounted = useRef(false);
   const [pageInfo, setPageInfo] = useImmer(
     pagination(props.page, props.pageSize, props.total)
   );
 
   if (pageInfo.totalPage <= 1) {
-    mounted.current = true;
     return null;
   }
   const [pageList, setPageList] = useImmer<number[]>([]);
+  const [totalPageList, setTotalPageList] = useImmer<number[]>([]);
 
-  if (!mounted.current) {
-    console.log(props, pageInfo);
-    let start = pageInfo.page;
-    const limit = Math.min(props.limit || 5, pageInfo.totalPage);
 
-    if (start > pageInfo.totalPage - limit) {
-      start = pageInfo.totalPage - limit;
+
+  // 生成总页码列表
+  useEffect(() => {
+    const list: number[] = Array.from({ length: pageInfo.totalPage }, (_, i) => i + 1);
+    setTotalPageList(list);
+  }, [pageInfo.totalPage]);
+
+  // 根据当前页码和总页码列表生成页码列表
+  useEffect(() => {
+    const currentPageIndex = totalPageList.findIndex((item) => item === props.page);
+
+    let start = Math.max(0, currentPageIndex - 2);
+    let end = Math.min(totalPageList.length, start + 5);
+    if (end - start < 5) {
+      start = Math.max(0, end - 5);
     }
 
-    const list: number[] = [];
-
-    console.log(start, limit);
-
-    for (let i = 0; i < limit; i++) {
-      list.push(start + i);
-    }
-
+    const list: number[] = totalPageList.slice(start, end);
     setPageList(list);
-    mounted.current = true;
-  }
+  }, [props.page, totalPageList]);
 
   return (
     <Pagination>
@@ -71,19 +71,45 @@ const PaginationMemo = (props: PaginationProps) => {
           <ChevronsLeft />
         </Button>
 
-        {JSON.stringify(pageList)}
+        {pageList[0] !== 1 && (
+          <PaginationItem>
+            <PaginationLink
+              className="cursor-pointer"
+              onClick={() => {
+                props.onChange?.(1);
+              }}
+            >
+              1 ...
+            </PaginationLink>
+          </PaginationItem>
+        )}
 
         {pageList.map((item) => (
           <PaginationItem key={item}>
             <PaginationLink
+              className="cursor-pointer"
               onClick={() => {
                 props.onChange?.(item);
               }}
+              isActive={item === props.page}
             >
               {item}
             </PaginationLink>
           </PaginationItem>
         ))}
+
+        {pageList[pageList.length - 1] !== pageInfo.totalPage && (
+          <PaginationItem>
+            <PaginationLink
+              className="cursor-pointer"
+              onClick={() => {
+                props.onChange?.(pageInfo.totalPage);
+              }}
+            >
+              ... {pageInfo.totalPage}
+            </PaginationLink>
+          </PaginationItem>
+        )}
 
         <Button
           aria-label="Next page"
