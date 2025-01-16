@@ -7,8 +7,16 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      "@/*": path.resolve(__dirname, "./src/*")
+      "@/*": path.resolve(__dirname, "./src/*"),
+      "#/*": path.resolve(__dirname, "./types/*"),
     },
+  },
+  server: {
+    host: "localhost",
+    port: Number(process.env.VITE_PORT),
+  },
+  define: {
+    "process.env": process.env
   },
   build: {
     outDir: "dist",

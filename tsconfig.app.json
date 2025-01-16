@@ -18,7 +18,8 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "#/*": ["./types/*"]
     },
 
     /* Linting */
@@ -30,5 +31,5 @@
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": ["src", "types"]
 }
