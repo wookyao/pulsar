@@ -1,3 +1,5 @@
+import useMessage from "@/store/use-message";
+
 export type Middleware = {
   request?: (config: RequestInit) => RequestInit;
   response?: (response: Response) => Promise<Response>;
@@ -174,9 +176,34 @@ const AuthMiddleware: Middleware = {
   },
 };
 
+const CommonMiddleware: Middleware = {
+  response: async (response) => {
+    const contentType = response.headers.get("content-type");
+    console.log("🚀 ~ response: ~ response:", response);
+    console.log("🚀 ~ response: ~ contentType:", contentType);
+
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
+    }
+
+    if (contentType && contentType.includes("application/json")) {
+      const json = await response.json();
+
+      if (json.code) {
+        useMessage.getState().showError(json.message);
+        return null;
+      }
+
+      return json;
+    }
+    return response;
+  },
+};
+
 export const fetchClient = new FetchClient({
-  baseUrl: process.env.VITE_API_BASE_URL,
-  middlewares: [AuthMiddleware],
+  baseUrl: import.meta.env.VITE_API_BASE_URL,
+  middlewares: [AuthMiddleware, CommonMiddleware],
 });
 
 export default FetchClient;

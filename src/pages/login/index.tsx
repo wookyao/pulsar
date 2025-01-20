@@ -1,11 +1,13 @@
 import { z } from "zod";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
+import { Toast } from "primereact/toast";
 import FieldError from "@/components/field-error";
+import { UserLogin } from "@/api/user.api";
 
 type LoginState = {
   identity: string;
@@ -17,7 +19,17 @@ const schema = z.object({
   password: z.string().min(6, "密码长度至少为6位"),
 });
 
+const doLogin = async (data: LoginState) => {
+  const res = await UserLogin({
+    account: data.identity,
+    password: data.password,
+  });
+
+  return res;
+};
+
 const LoginScreen = () => {
+  const toast = useRef<Toast>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useImmer<LoginState>({
     identity: "",
@@ -44,6 +56,16 @@ const LoginScreen = () => {
 
     try {
       schema.parse(formData);
+
+      const res = await doLogin(formData);
+      if (!res) return;
+
+      toast.current?.show({
+        severity: "success",
+        summary: "登陆成功",
+        detail: `${formData.identity} 您好,欢迎回来!`,
+      });
+
       clearErrors();
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -125,6 +147,8 @@ const LoginScreen = () => {
           />
         </div>
       </form>
+
+      <Toast ref={toast} />
     </div>
   );
 };
