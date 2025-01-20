@@ -9,7 +9,7 @@ import "primeicons/primeicons.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PrimeReactProvider value={{ unstyled: false }}>
+    <PrimeReactProvider value={{ unstyled: false, ripple: true }}>
       <App />
     </PrimeReactProvider>
   </StrictMode>
