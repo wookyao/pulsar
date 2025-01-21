@@ -1,12 +1,13 @@
 import { createBrowserRouter, RouteObject } from "react-router-dom";
 import LazyImport from "@/components/lazy-import";
 import { lazy } from "react";
-import AppLayout from "@/layout/app";
+// import AppLayout from "@/layout/app";
+import AppMain from "@/layout/app-main/index";
 
 const commonRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <AppLayout />,
+    element: <AppMain />,
 
     children: [
       {

@@ -12,3 +12,12 @@
   @tailwind components;
   @tailwind utilities;
 }
+
+
+:root {
+  --app-bezier: cubic-bezier(.25,.8,.25,1);
+  --app-surface-ground: #f9fafb;
+  --app-header-height: 64px;
+  --app-sidebar-width: 240px;
+
+}

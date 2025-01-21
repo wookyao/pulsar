@@ -1,0 +1,49 @@
+
+
+.app-main {
+
+  --side-bar-width: var(--app-sidebar-width);
+
+  @apply h-screen w-screen overflow-hidden relative;
+  background-color: var(--app-surface-ground);
+
+  // 侧边栏关闭时
+  &[data-closed] {
+
+    .app-main {
+      &__sidebar {
+        transform: translateX(-100%);
+        visibility: hidden;
+      }
+      &__content {
+        margin-left: 0;
+      }
+    }
+  }
+
+
+  &__sidebar {
+    @apply absolute left-0 top-0 bottom-0;
+    @apply bg-white rounded-e-3xl overflow-hidden;
+
+    visibility: visible;
+    width: var(--side-bar-width, 240px);
+
+    will-change: transform, visibility;
+    transition: transform .4s var(--app-bezier), visibility .4s var(--app-bezier);
+  }
+
+  &__content {
+    @apply block relative h-screen overflow-auto;
+
+    margin-left: var(--side-bar-width, 240px);
+
+
+    will-change: margin-left;
+    transition: margin-left .4s var(--app-bezier);
+  }
+
+}
+
+
+
