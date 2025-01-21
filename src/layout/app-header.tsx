@@ -1,175 +1,75 @@
-import { MegaMenu } from "primereact/megamenu";
+import { memo } from "react";
+import { Link } from "react-router-dom";
+import { PermissionItem } from "#/auth.api";
+import { Avatar } from "primereact/avatar";
+import { Menubar } from "primereact/menubar";
 import { MenuItem } from "primereact/menuitem";
+import useUserStore from "@/store/use-user";
+import Icon from "@/components/icon";
 
-const items: MenuItem[] = [
-  {
-    label: "Furniture",
-    icon: "pi pi-box",
-    items: [
-      [
-        {
-          label: "Living Room",
-          items: [
-            { label: "Accessories" },
-            { label: "Armchair" },
-            { label: "Coffee Table" },
-            { label: "Couch" },
-            { label: "TV Stand" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Kitchen",
-          items: [
-            { label: "Bar stool" },
-            { label: "Chair" },
-            { label: "Table" },
-          ],
-        },
-        {
-          label: "Bathroom",
-          items: [{ label: "Accessories" }],
-        },
-      ],
-      [
-        {
-          label: "Bedroom",
-          items: [
-            { label: "Bed" },
-            { label: "Chaise lounge" },
-            { label: "Cupboard" },
-            { label: "Dresser" },
-            { label: "Wardrobe" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Office",
-          items: [
-            { label: "Bookcase" },
-            { label: "Cabinet" },
-            { label: "Chair" },
-            { label: "Desk" },
-            { label: "Executive Chair" },
-          ],
-        },
-      ],
-    ],
-  },
-  {
-    label: "Electronics",
-    icon: "pi pi-mobile",
-    items: [
-      [
-        {
-          label: "Computer",
-          items: [
-            { label: "Monitor" },
-            { label: "Mouse" },
-            { label: "Notebook" },
-            { label: "Keyboard" },
-            { label: "Printer" },
-            { label: "Storage" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Home Theather",
-          items: [
-            { label: "Projector" },
-            { label: "Speakers" },
-            { label: "TVs" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Gaming",
-          items: [
-            { label: "Accessories" },
-            { label: "Console" },
-            { label: "PC" },
-            { label: "Video Games" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Appliances",
-          items: [
-            { label: "Coffee Machine" },
-            { label: "Fridge" },
-            { label: "Oven" },
-            { label: "Vaccum Cleaner" },
-            { label: "Washing Machine" },
-          ],
-        },
-      ],
-    ],
-  },
-  {
-    label: "Sports",
-    icon: "pi pi-clock",
-    items: [
-      [
-        {
-          label: "Football",
-          items: [
-            { label: "Kits" },
-            { label: "Shoes" },
-            { label: "Shorts" },
-            { label: "Training" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Running",
-          items: [
-            { label: "Accessories" },
-            { label: "Shoes" },
-            { label: "T-Shirts" },
-            { label: "Shorts" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Swimming",
-          items: [
-            { label: "Kickboard" },
-            { label: "Nose Clip" },
-            { label: "Swimsuits" },
-            { label: "Paddles" },
-          ],
-        },
-      ],
-      [
-        {
-          label: "Tennis",
-          items: [
-            { label: "Balls" },
-            { label: "Rackets" },
-            { label: "Shoes" },
-            { label: "Training" },
-          ],
-        },
-      ],
-    ],
-  },
-];
+function AppHeader() {
+  const { menus, indexPath } = useUserStore();
+  console.log("🚀 ~ TemplateDemo ~ menus:", menus);
 
-export default function TemplateDemo() {
+  const items = genItems8Menus(menus);
+  console.log("🚀 ~ AppHeader ~ items:", items);
+
   return (
-    <MegaMenu
+    <Menubar
       model={items}
-      orientation="horizontal"
-      breakpoint="960px"
-      className="p-3 surface-0 shadow-2"
-      style={{ borderRadius: "3rem" }}
+      start={
+        <Link to={indexPath}>
+          <h1 className="text-xl md:text-2xl font-bold cursor-pointer">
+            PULSAR OA
+          </h1>
+        </Link>
+      }
+      end={<HeaderAvatar />}
+      className="p-3 bg-white shadow-sm"
+      pt={{
+        root: {
+          className: "flex justify-between gap-4",
+        },
+        menu: {
+          className: "flex-1 ",
+        },
+      }}
     />
   );
 }
+
+const HeaderAvatar = memo(() => {
+  return (
+    <div className="flex items-center justify-center cursor-pointer">
+      <Avatar image="/amyelsner.png" shape="circle" size="large" />
+    </div>
+  );
+});
+
+function genItems8Menus(menus: PermissionItem[]): MenuItem[] {
+  const list: MenuItem[] = [];
+
+  menus.forEach((item) => {
+    const row: MenuItem = {
+      label: item.name,
+    };
+
+    if (item.icon) {
+      row.icon = <Icon className="mr-2" size={16} name={item.icon} />;
+    }
+
+    if (Array.isArray(item.children) && item.children.length > 0) {
+      row.items = genItems8Menus(item.children);
+    }
+
+    if (!item.children) {
+      row.url = item.path;
+    }
+
+    list.push(row);
+  });
+
+  return list;
+}
+
+export default AppHeader;

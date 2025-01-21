@@ -1,11 +1,11 @@
 import { Outlet } from "react-router-dom";
-import TemplateDemo from "./app-header";
+import AppHeader from "./app-header";
 
 const AppLayout = () => {
   return (
     <div className="h-screen w-screen flex flex-col bg-neutral-100">
-      <div className="h-16 bg-white">
-        <TemplateDemo />
+      <div className="bg-white">
+        <AppHeader />
       </div>
       <div className="flex-1">
         <Outlet />
