@@ -1,6 +1,6 @@
-import { UserLoginReq } from "#/user.api";
+import { UserLoginReq } from "#/auth.api";
 import { fetchClient } from "@/help/fetch-client";
 
-export const UserLogin = (data: UserLoginReq) => {
-  return fetchClient.post("/v1/login", data);
+export const UserLogin = <T>(data: UserLoginReq) => {
+  return fetchClient.post<T>("/v1/login", data);
 };

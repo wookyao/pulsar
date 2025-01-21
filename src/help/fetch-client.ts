@@ -1,8 +1,12 @@
+import { FetchResponse } from "#/fetch";
 import useMessage from "@/store/use-message";
 
 export type Middleware = {
   request?: (config: RequestInit) => RequestInit;
-  response?: (response: Response) => Promise<Response>;
+  response?: (
+    response: Response,
+    res: Blob | FetchResponse<any>
+  ) => Promise<Response>;
 };
 
 class FetchClient {
@@ -31,7 +35,7 @@ class FetchClient {
   }
 
   //发送请求
-  async request(url: string, options: RequestInit, timeout: number) {
+  async request<T = any>(url: string, options: RequestInit, timeout: number) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
@@ -43,9 +47,12 @@ class FetchClient {
     try {
       const response = await fetch(this.baseUrl + url, config);
       clearTimeout(timeoutId);
+
+      const res = await this.processResponse<T>(response);
+
       // 处理中间件
-      const processedResponse = await this.applyResponseMiddlewares(response);
-      return processedResponse;
+      await this.applyResponseMiddlewares(response, res);
+      return res;
     } catch (error) {
       if (error instanceof Error && error.name === "AbortError") {
         throw new Error("Request timed out");
@@ -55,66 +62,65 @@ class FetchClient {
   }
 
   // get 请求
-  get(
+  get<T>(
     url: string,
     params: Record<string, any> = {},
     options: RequestInit = {}
   ) {
     // 处理参数
     url = this.formatParams(url, params);
-    return this.request(
+    return this.request<T>(
       url,
       { ...options, method: "GET" },
       this.defaultTimeout
-    );
+    ) as Promise<FetchResponse<T>>;
   }
 
   // post 请求
-  post(url: string, data: Record<string, any>, options: RequestInit = {}) {
-    return this.request(
+  post<T>(url: string, data: Record<string, any>, options: RequestInit = {}) {
+    return this.request<T>(
       url,
       { ...options, method: "POST", body: JSON.stringify(data) },
       this.defaultTimeout
-    );
+    ) as Promise<FetchResponse<T>>;
   }
 
   // put 请求
-  put(url: string, data: Record<string, any>, options: RequestInit = {}) {
-    return this.request(
+  put<T>(url: string, data: Record<string, any>, options: RequestInit = {}) {
+    return this.request<T>(
       url,
       { ...options, method: "PUT", body: JSON.stringify(data) },
       this.defaultTimeout
-    );
+    ) as Promise<FetchResponse<T>>;
   }
 
   // delete 请求
-  delete(url: string, options: RequestInit = {}) {
-    return this.request(
+  delete<T>(url: string, options: RequestInit = {}) {
+    return this.request<T>(
       url,
       { ...options, method: "DELETE" },
       this.defaultTimeout
-    );
+    ) as Promise<FetchResponse<T>>;
   }
 
   // 处理文件上传
-  upload(url: string, file: File, options: RequestInit = {}) {
+  upload<T>(url: string, file: File, options: RequestInit = {}) {
     const formData = new FormData();
     formData.append("file", file);
-    return this.request(
+    return this.request<T>(
       url,
       { ...options, method: "POST", body: formData },
       this.defaultTimeout
-    );
+    ) as Promise<FetchResponse<T>>;
   }
 
   // 处理文件下载
   async download(url: string, options: RequestInit = {}) {
-    const response = await this.request(
+    return this.request(
       url,
       { ...options, method: "GET" },
       this.defaultTimeout
-    );
-    return await response.blob();
+    ) as Promise<Blob>;
   }
 
   // 处理中间件 （before）
@@ -128,14 +134,15 @@ class FetchClient {
   }
 
   // 处理中间件 （after）
-  private async applyResponseMiddlewares(
-    response: Response
+  private async applyResponseMiddlewares<T>(
+    response: Response,
+    res: Blob | FetchResponse<T>
   ): Promise<Response> {
     let result = response;
 
     for (const middleware of this.middlewares) {
       if (middleware.response) {
-        result = await middleware.response(result);
+        result = await middleware.response(result, res);
       }
     }
 
@@ -153,6 +160,23 @@ class FetchClient {
     }
     return url;
   }
+
+  private processResponse = async <T = any>(
+    response: Response
+  ): Promise<FetchResponse<T> | Blob> => {
+    let contentType = response.headers.get("Content-Type") || "";
+
+    contentType = String(contentType).toLowerCase();
+
+    if (
+      contentType.includes("application/octet-stream") ||
+      contentType.includes("image/")
+    ) {
+      return response.blob();
+    }
+
+    return response.json();
+  };
 }
 
 // 中间件
@@ -167,43 +191,31 @@ const AuthMiddleware: Middleware = {
     }
     return config;
   },
-  response: async (response) => {
-    if (response.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return response;
-  },
-};
-
-const CommonMiddleware: Middleware = {
-  response: async (response) => {
-    const contentType = response.headers.get("content-type");
-    console.log("🚀 ~ response: ~ response:", response);
-    console.log("🚀 ~ response: ~ contentType:", contentType);
-
+  response: async (response, res) => {
     if (response.status === 401) {
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
 
-    if (contentType && contentType.includes("application/json")) {
-      const json = await response.json();
+    if (!(res instanceof Blob)) {
+      const code = res.code;
+      if (code) {
+        useMessage.getState().showError(res?.message || "请求失败");
 
-      if (json.code) {
-        useMessage.getState().showError(json.message);
-        return null;
+        if (code === 2000) {
+          localStorage.removeItem("token");
+          window.location.href = "/login";
+        }
       }
-
-      return json;
     }
+
     return response;
   },
 };
 
 export const fetchClient = new FetchClient({
   baseUrl: import.meta.env.VITE_API_BASE_URL,
-  middlewares: [AuthMiddleware, CommonMiddleware],
+  middlewares: [AuthMiddleware],
 });
 
 export default FetchClient;

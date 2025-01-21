@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ChangeEvent, useRef, useState } from "react";
 import { useImmer } from "use-immer";
+import { useNavigate } from "react-router-dom";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
@@ -8,24 +9,13 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import FieldError from "@/components/field-error";
 import { UserLogin } from "@/api/user.api";
+import { arrayToTree } from "@/help/array-to-tree";
+import { PermissionItem, UserLoginRes } from "#/auth.api";
+import useUserStore from "@/store/use-user";
 
 type LoginState = {
   identity: string;
   password: string;
-};
-
-const schema = z.object({
-  identity: z.string().email("请输入正确的邮箱地址"),
-  password: z.string().min(6, "密码长度至少为6位"),
-});
-
-const doLogin = async (data: LoginState) => {
-  const res = await UserLogin({
-    account: data.identity,
-    password: data.password,
-  });
-
-  return res;
 };
 
 const LoginScreen = () => {
@@ -39,6 +29,9 @@ const LoginScreen = () => {
     identity: "",
     password: "",
   });
+
+  const { login, indexPath } = useUserStore();
+  const navigate = useNavigate();
 
   const clearErrors = () => {
     setErrors((draft) => {
@@ -57,16 +50,30 @@ const LoginScreen = () => {
     try {
       schema.parse(formData);
 
+      clearErrors();
       const res = await doLogin(formData);
+
       if (!res) return;
+      console.log("🚀 ~ onSubmit ~ res:", res);
+
+      const [indexPathUrl, treePerms] = getRedirectUrl(res?.data ?? {});
+      console.log("🚀 ~ onSubmit ~ treePerms:", treePerms);
+      if (!indexPathUrl) {
+        toast.current?.show({
+          severity: "warn",
+          summary: "警告",
+          detail: "当前账号无任何权限，请联系管理员",
+        });
+        return;
+      }
+
+      login(res.data, treePerms, indexPathUrl);
 
       toast.current?.show({
         severity: "success",
         summary: "登陆成功",
         detail: `${formData.identity} 您好,欢迎回来!`,
       });
-
-      clearErrors();
     } catch (error) {
       if (error instanceof z.ZodError) {
         setErrors((draft) => {
@@ -77,6 +84,14 @@ const LoginScreen = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const successFn = () => {
+    if (indexPath) {
+      navigate(indexPath, {
+        replace: true,
+      });
     }
   };
 
@@ -96,7 +111,7 @@ const LoginScreen = () => {
               <InputIcon className="pi pi-user"></InputIcon>
               <InputText
                 className="w-full"
-                placeholder="邮箱"
+                placeholder="手机号"
                 invalid={!!errors.identity}
                 value={formData.identity}
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
@@ -148,9 +163,51 @@ const LoginScreen = () => {
         </div>
       </form>
 
-      <Toast ref={toast} />
+      <Toast ref={toast} onHide={successFn} />
     </div>
   );
 };
+
+// zod 表单验证
+const schema = z.object({
+  identity: z
+    .string()
+    .email("请输入正确的邮箱地址")
+    .or(z.string().regex(/^1[3-9]\d{9}$/, "请输入正确的手机号码")),
+  password: z.string().min(6, "密码长度至少为6位"),
+});
+
+const doLogin = async (data: LoginState) => {
+  const res = await UserLogin<UserLoginRes>({
+    account: data.identity,
+    password: data.password,
+  });
+
+  return res;
+};
+
+function getRedirectUrl(userInfo: UserLoginRes): [string, PermissionItem[]] {
+  const treePerms = arrayToTree(
+    userInfo.perms.sort((a, b) => a.sort! - b.sort!)
+  );
+
+  if (treePerms.length === 0) {
+    return ["", []];
+  }
+
+  const item = treePerms[0] as PermissionItem;
+
+  function getUrl(item: PermissionItem) {
+    if (item.children?.length) {
+      return getUrl(item.children[0]);
+    }
+
+    return item.path;
+  }
+
+  const url = getUrl(item);
+
+  return [url, treePerms];
+}
 
 export default LoginScreen;
