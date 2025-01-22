@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AppHeader from "./app-header";
 import "./style/index.less";
+import { Button } from "primereact/button";
 
 const AppMain = () => {
   const [toggle, setToggle] = useState(true);
@@ -22,7 +23,9 @@ const AppMain = () => {
       <div className="app-main__sidebar"></div>
       <div className="app-main__content">
         <AppHeader onToggle={handleToggle} />
-        <div style={{ height: "150vh" }}></div>
+        <div style={{ height: "150vh" }}>
+          <Button label="Submit" />
+        </div>
       </div>
     </div>
   );

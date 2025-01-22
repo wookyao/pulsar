@@ -7,7 +7,9 @@ import {
   useState,
 } from "react";
 import { PrimeReactContext } from "primereact/api";
+import { useMountEffect } from "primereact/hooks";
 import { Theme, ThemeMode, ThemeProviderState } from "#/app";
+import { getSystemMode } from "../help";
 import { THEME } from "../config/theme";
 
 const initialState: ThemeProviderState = {
@@ -39,12 +41,6 @@ function getDirName(theme: Theme, mode: ThemeMode) {
   const key = mode === "system" ? getSystemMode() : mode;
 
   return config[key];
-}
-
-function getSystemMode() {
-  return window.matchMedia("(prefers-color-scheme: dark)").matches
-    ? "dark"
-    : "light";
 }
 
 const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = (props) => {
@@ -88,26 +84,56 @@ const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = (props) => {
       const currentTheme = getDirName(prev.theme, prev.mode);
       const newTheme = getDirName(s.theme || prev.theme, s.mode || prev.mode);
 
-      changeTheme?.(currentTheme, newTheme, "theme-link");
+      const styleElement = document.querySelector(
+        "style[data-primereact-style-id]"
+      );
 
-      return {
+      changeTheme?.(currentTheme, newTheme, "theme-link", () => {
+        // 获取 link 标签 并将link 标签 放到 head 最后
+        const link = document.querySelector("#theme-link") as HTMLLinkElement;
+
+        const hasDataMove = link.hasAttribute("data-moved");
+
+        if (link && !hasDataMove) {
+          document.head.removeChild(link);
+        }
+
+        if (!hasDataMove) {
+          link.setAttribute("data-moved", "");
+
+          // 获取 head 元素
+          const head = document.head;
+          head.insertBefore(link, styleElement);
+        }
+      });
+
+      const result = {
         ...prev,
         ...s,
       };
+
+      localStorage.setItem(modeStorageKey, result.mode);
+      localStorage.setItem(themeStorageKey, result.theme);
+
+      return result;
     });
   };
+
+  useMountEffect(() => {
+    console.log(6666);
+    changeState({
+      mode: state.mode,
+      theme: state.theme,
+    });
+  });
 
   const value = {
     mode: state.mode,
     theme: state.theme,
     setMode: (mode: ThemeMode) => {
-      localStorage.setItem(modeStorageKey, mode);
-      // setMode(mode);
       changeState({ mode });
     },
     setTheme: (theme: Theme) => {
-      localStorage.setItem(themeStorageKey, theme);
-      // setTheme(theme);
       changeState({ theme });
     },
   };

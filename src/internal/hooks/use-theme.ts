@@ -19,17 +19,6 @@ export const useTheme = () => {
 
 export const useToggleTheme = () => {
   const { mode, theme, setMode } = useTheme();
-  // const { changeTheme } = useContext(PrimeReactContext);
-
-  // const _changeTheme = (theme: string, colorScheme: string) => {
-  //   changeTheme?.(layoutConfig.theme, theme, "theme-css", () => {
-  //     setLayoutConfig((prevState: LayoutConfig) => ({
-  //       ...prevState,
-  //       theme,
-  //       colorScheme,
-  //     }));
-  //   });
-  // };
 
   const _changeMode = (mode: ThemeMode) => {
     setMode(mode);

@@ -20,3 +20,13 @@ export function isDarkMode() {
 export function isLightMode() {
   return window.matchMedia("(prefers-color-scheme: light)").matches;
 }
+
+/**
+ * 获取系统的当前模式
+ * @returns 系统的当前模式
+ */
+export function getSystemMode() {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark"
+    : "light";
+}

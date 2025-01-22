@@ -4,13 +4,14 @@ import { PrimeReactProvider } from "primereact/api";
 import App from "./App.tsx";
 
 import ThemeProvider from "_/provider/theme-provider.tsx";
+import { getSystemMode } from "_/help/index.ts";
 import "@/common/styles/index.css";
 import "primeicons/primeicons.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PrimeReactProvider value={{ unstyled: false, ripple: true }}>
-      <ThemeProvider defaultMode="light" defaultTheme="lara-blue">
+    <PrimeReactProvider>
+      <ThemeProvider defaultMode={getSystemMode()} defaultTheme="lara-blue">
         <App />
       </ThemeProvider>
     </PrimeReactProvider>

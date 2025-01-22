@@ -157,7 +157,6 @@ const LoginScreen = () => {
             loading={loading}
             label={loading ? "登录中..." : "登 录"}
             severity="secondary"
-            size="small"
             type="submit"
           />
         </div>
