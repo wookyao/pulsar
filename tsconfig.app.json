@@ -18,8 +18,9 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "#/*": ["./types/*"]
+      "@/*": ["./src/*"], // @/foo -> src/foo
+      "_/*": ["./src/internal/*"], // _/foo -> src/internal/foo
+      "#/*": ["./types/*"] // #/foo -> types/foo
     },
 
     /* Linting */

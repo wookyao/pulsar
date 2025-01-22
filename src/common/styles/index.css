@@ -1,8 +1,7 @@
 @layer tailwind-base, primereact, tailwind-utilities;
 
 /* IMPORTANT: Styled mode you must add the PrimeReact Theme here. Do not include in unstyled mode */
-@import 'primereact/resources/themes/lara-light-blue/theme.css';
-
+@import "primereact/resources/themes/lara-light-blue/theme.css";
 
 @layer tailwind-base {
   @tailwind base;
@@ -13,11 +12,39 @@
   @tailwind utilities;
 }
 
+/* light-dark(#efedf0, #1f2022); */
+@layer {
+  :root {
+    --app-bezier: cubic-bezier(0.25, 0.8, 0.25, 1);
+    --app-surface-ground: #efedf0;
+    --app-header-height: 64px;
+    --app-sidebar-width: 240px;
+  }
 
-:root {
-  --app-bezier: cubic-bezier(.25,.8,.25,1);
-  --app-surface-ground: #f9fafb;
-  --app-header-height: 64px;
-  --app-sidebar-width: 240px;
+  .dark {
+    --app-surface-ground: #1f2022;
+  }
+}
 
+/**
+ Animated Theme Toggle
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+.dark::view-transition-old(root) {
+  z-index: 1;
+}
+.dark::view-transition-new(root) {
+  z-index: 999;
+}
+
+::view-transition-old(root) {
+  z-index: 999;
+}
+::view-transition-new(root) {
+  z-index: 1;
 }

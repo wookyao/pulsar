@@ -18,6 +18,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        ["_"]: path.resolve(__dirname, "./src/internal"),
         "#": path.resolve(__dirname, "./types"),
       },
     },

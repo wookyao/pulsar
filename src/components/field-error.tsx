@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from "react";
-import cn from "@/help/cn";
+import cn from "_/help/cn";
 
 type FieldErrorProps = {
   error: string;

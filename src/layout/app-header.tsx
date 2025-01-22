@@ -5,7 +5,7 @@ import { Avatar } from "primereact/avatar";
 import { Menubar } from "primereact/menubar";
 import { MenuItem } from "primereact/menuitem";
 import useUserStore from "@/store/use-user";
-import Icon from "@/components/icon";
+import Icon from "@/components/icon.tsx";
 
 function AppHeader() {
   const { menus, indexPath } = useUserStore();

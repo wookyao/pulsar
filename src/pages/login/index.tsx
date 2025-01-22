@@ -7,9 +7,9 @@ import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import FieldError from "@/components/field-error";
+import FieldError from "@/components/field-error.tsx";
 import { UserLogin } from "@/api/user.api";
-import { arrayToTree } from "@/help/array-to-tree";
+import { arrayToTree } from "_/help/array-to-tree";
 import { PermissionItem, UserLoginRes } from "#/auth.api";
 import useUserStore from "@/store/use-user";
 
