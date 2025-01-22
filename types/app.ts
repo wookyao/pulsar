@@ -25,4 +25,5 @@ export type ThemeConf = {
   dark: string;
   label: string;
   group: string;
+  backgrounds: [string, string];
 };

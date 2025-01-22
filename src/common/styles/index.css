@@ -3,10 +3,6 @@
 /* IMPORTANT: Styled mode you must add the PrimeReact Theme here. Do not include in unstyled mode */
 /* @import "primereact/resources/themes/lara-light-blue/theme.css"; */
 
-html {
-  font-size: 14px;
-}
-
 @layer tailwind-base {
   @tailwind base;
 }

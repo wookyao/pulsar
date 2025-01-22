@@ -18,7 +18,7 @@ export const useTheme = () => {
 };
 
 export const useToggleTheme = () => {
-  const { mode, theme, setMode } = useTheme();
+  const { mode, theme, setMode, setTheme } = useTheme();
 
   const _changeMode = (mode: ThemeMode) => {
     setMode(mode);
@@ -71,6 +71,7 @@ export const useToggleTheme = () => {
   return {
     theme,
     mode,
+    setTheme,
     toggleMode,
   };
 };
