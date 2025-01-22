@@ -1,24 +1,12 @@
-import { createContext, useContext, useEffect, useState } from "react";
-
-type Theme = "dark" | "light" | "system";
+import { useContext, useEffect, useState } from "react";
+import { Theme } from "#/app";
+import { ThemeProviderContext } from "_/provider/theme-provider";
 
 type ThemeProviderProps = {
   children: React.ReactNode;
   defaultTheme?: Theme;
   storageKey?: string;
 };
-
-type ThemeProviderState = {
-  theme: Theme;
-  setTheme: (theme: Theme) => void;
-};
-
-const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
-};
-
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
@@ -71,11 +59,3 @@ export const useTheme = () => {
 
   return context;
 };
-
-/**
- * 检测用户的系统是否被开启了动画减弱功能
- * @link https://developer.mozilla.org/zh-CN/docs/Web/CSS/@media/prefers-reduced-motion
- */
-export function isReducedMotion() {
-  return window.matchMedia(`(prefers-reduced-motion: reduce)`).matches === true;
-}

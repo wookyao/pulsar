@@ -1,0 +1,69 @@
+// 切换主题色
+// 1. 切换 primereact 的主题色
+// 2. 切换 tailwindcss 的主题色
+
+import { useContext } from "react";
+import { ThemeProviderContext } from "_/provider/theme-provider";
+import { isReducedMotion } from "../help";
+
+export const useTheme = () => {
+  const context = useContext(ThemeProviderContext);
+
+  if (context === undefined)
+    throw new Error("useTheme必须在ThemeProvider中使用");
+
+  return context;
+};
+
+export const useToggleTheme = () => {
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const willDark = theme === "light";
+
+    // 判断浏览器是否支持 viewTransition 或者 是否开启了 动画减弱
+    if (!document.startViewTransition || isReducedMotion()) {
+      setTheme(willDark ? "dark" : "light");
+      return;
+    }
+
+    // 开启 viewTransition
+    const transition = document.startViewTransition(async () => {
+      setTheme(willDark ? "dark" : "light");
+    });
+
+    // 传入点击事件，从点击处开始扩散。否则，从右上角开始扩散
+    const x = event?.clientX ?? window.innerWidth;
+    const y = event?.clientY ?? 0;
+
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    void transition.ready.then(() => {
+      // 创建一个圆形的裁剪区域，从点击处开始扩散
+      const clipPath = [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`,
+      ];
+      document.documentElement.animate(
+        {
+          clipPath: willDark ? clipPath : [...clipPath].reverse(),
+        },
+        {
+          duration: 300,
+          easing: "ease-in",
+          pseudoElement: willDark
+            ? "::view-transition-new(root)"
+            : "::view-transition-old(root)",
+        }
+      );
+    });
+  };
+
+  return {
+    theme,
+    toggleTheme,
+  };
+};
