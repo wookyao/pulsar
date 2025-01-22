@@ -9,7 +9,7 @@ import "primeicons/primeicons.css";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultTheme="light">
       <PrimeReactProvider value={{ unstyled: false, ripple: true }}>
         <App />
       </PrimeReactProvider>

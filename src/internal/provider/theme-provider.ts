@@ -1,4 +1,5 @@
 import { createContext } from "react";
+
 import { ThemeProviderState } from "#/app";
 
 const initialState: ThemeProviderState = {

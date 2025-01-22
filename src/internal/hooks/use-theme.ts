@@ -3,6 +3,7 @@
 // 2. 切换 tailwindcss 的主题色
 
 import { useContext } from "react";
+import { PrimeReactContext } from 'primereact/api';
 import { ThemeProviderContext } from "_/provider/theme-provider";
 import { isReducedMotion } from "../help";
 
@@ -17,6 +18,14 @@ export const useTheme = () => {
 
 export const useToggleTheme = () => {
   const { theme, setTheme } = useTheme();
+  const {  changeTheme } = useContext(PrimeReactContext);
+
+
+  const _changeTheme = (theme: string, colorScheme: string) => {
+    changeTheme?.(layoutConfig.theme, theme, 'theme-css', () => {
+        setLayoutConfig((prevState: LayoutConfig) => ({ ...prevState, theme, colorScheme }));
+    });
+};
 
   const toggleTheme = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const willDark = theme === "light";
