@@ -3,9 +3,10 @@
 // 2. 切换 tailwindcss 的主题色
 
 import { useContext } from "react";
-import { PrimeReactContext } from 'primereact/api';
-import { ThemeProviderContext } from "_/provider/theme-provider";
+// import { PrimeReactContext } from "primereact/api";
+import { ThemeProviderContext } from "_/provider/theme-provider.tsx";
 import { isReducedMotion } from "../help";
+import { ThemeMode } from "#/app";
 
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
@@ -17,28 +18,35 @@ export const useTheme = () => {
 };
 
 export const useToggleTheme = () => {
-  const { theme, setTheme } = useTheme();
-  const {  changeTheme } = useContext(PrimeReactContext);
+  const { mode, theme, setMode } = useTheme();
+  // const { changeTheme } = useContext(PrimeReactContext);
 
+  // const _changeTheme = (theme: string, colorScheme: string) => {
+  //   changeTheme?.(layoutConfig.theme, theme, "theme-css", () => {
+  //     setLayoutConfig((prevState: LayoutConfig) => ({
+  //       ...prevState,
+  //       theme,
+  //       colorScheme,
+  //     }));
+  //   });
+  // };
 
-  const _changeTheme = (theme: string, colorScheme: string) => {
-    changeTheme?.(layoutConfig.theme, theme, 'theme-css', () => {
-        setLayoutConfig((prevState: LayoutConfig) => ({ ...prevState, theme, colorScheme }));
-    });
-};
+  const _changeMode = (mode: ThemeMode) => {
+    setMode(mode);
+  };
 
-  const toggleTheme = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const willDark = theme === "light";
+  const toggleMode = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const willDark = mode === "light";
 
     // 判断浏览器是否支持 viewTransition 或者 是否开启了 动画减弱
     if (!document.startViewTransition || isReducedMotion()) {
-      setTheme(willDark ? "dark" : "light");
+      _changeMode(willDark ? "dark" : "light");
       return;
     }
 
     // 开启 viewTransition
     const transition = document.startViewTransition(async () => {
-      setTheme(willDark ? "dark" : "light");
+      _changeMode(willDark ? "dark" : "light");
     });
 
     // 传入点击事件，从点击处开始扩散。否则，从右上角开始扩散
@@ -73,6 +81,7 @@ export const useToggleTheme = () => {
 
   return {
     theme,
-    toggleTheme,
+    mode,
+    toggleMode,
   };
 };

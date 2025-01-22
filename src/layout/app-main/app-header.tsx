@@ -12,7 +12,7 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({ onToggle }) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const { theme, toggleTheme } = useToggleTheme();
+  const { mode, toggleMode } = useToggleTheme();
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -45,8 +45,8 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggle }) => {
           <Badge severity="danger"></Badge>
         </i>
       </div>
-      <div className="item-card relative" onClick={toggleTheme}>
-        {theme === "light" ? (
+      <div className="item-card relative" onClick={toggleMode}>
+        {mode === "light" ? (
           <Moon size={20} data-scale />
         ) : (
           <Sun size={20} data-scale />
