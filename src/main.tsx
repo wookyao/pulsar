@@ -12,7 +12,7 @@ import "@/common/styles/home.less";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <PrimeReactProvider>
+    <PrimeReactProvider value={{ ripple: true }}>
       <ThemeProvider defaultMode={getSystemMode()} defaultTheme="lara-blue">
         <App />
       </ThemeProvider>

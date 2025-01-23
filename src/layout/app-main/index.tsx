@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMountEffect, useResizeListener } from "primereact/hooks";
-import AppHeader from "./app-header";
-import SvgIcon from "@/components/svg-icon";
-import "./style/index.less";
 import useUserStore from "@/store/use-user";
+import SvgIcon from "@/components/svg-icon";
+import AppHeader from "./app-header";
+import AppMenu from "./app-menu";
+import "./style/index.less";
 
 const AppMain = () => {
   const { user } = useUserStore();
@@ -82,6 +83,10 @@ const AppMain = () => {
               {roleLabel}
             </h5>
           </div>
+        </div>
+
+        <div className="mx-4">
+          <AppMenu />
         </div>
       </div>
       <div className="app-main__content">
