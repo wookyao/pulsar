@@ -1,17 +1,20 @@
 import { z } from "zod";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, memo, useRef, useState } from "react";
 import { useImmer } from "use-immer";
 import { useNavigate } from "react-router-dom";
+import { Moon, Palette, Sun } from "lucide-react";
 import { IconField } from "primereact/iconfield";
 import { InputIcon } from "primereact/inputicon";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { PermissionItem, UserLoginRes } from "#/auth.api";
 import FieldError from "@/components/field-error.tsx";
+import ThemeConfig from "@/components/theme-config";
+import useUserStore from "@/store/use-user";
 import { UserLogin } from "@/api/user.api";
 import { arrayToTree } from "_/help/array-to-tree";
-import { PermissionItem, UserLoginRes } from "#/auth.api";
-import useUserStore from "@/store/use-user";
+import { useToggleTheme } from "_/hooks/use-theme";
 
 type LoginState = {
   identity: string;
@@ -96,7 +99,8 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="h-screen flex items-center flex-col pt-20 md:pt-72">
+    <div className="h-screen  flex items-center flex-col pt-20 md:pt-72">
+      <ThemeBar />
       <h1 className="text-7xl md:text-9xl font-bold leading-tight tracking-wide">
         PULSAR
       </h1>
@@ -166,6 +170,29 @@ const LoginScreen = () => {
     </div>
   );
 };
+
+const ThemeBar = memo(() => {
+  const { mode, toggleMode } = useToggleTheme();
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <div className="fixed top-8 right-8 px-2 py-1 rounded-full bg-neutral-50 dark:bg-neutral-800 flex items-center justify-center gap-4">
+      <div className="icon-card" onClick={toggleMode}>
+        {mode === "light" ? (
+          <Moon size={20} data-scale />
+        ) : (
+          <Sun size={20} data-scale />
+        )}
+      </div>
+
+      <div className="icon-card" onClick={() => setVisible(true)}>
+        <Palette size={20} data-scale />
+      </div>
+
+      <ThemeConfig visible={visible} setVisible={setVisible} />
+    </div>
+  );
+});
 
 // zod 表单验证
 const schema = z.object({

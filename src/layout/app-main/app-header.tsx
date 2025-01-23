@@ -5,6 +5,7 @@ import { Badge } from "primereact/badge";
 import toggleFullScreen from "_/help/full-screen";
 import { useToggleTheme } from "_/hooks/use-theme";
 import ThemeConfig from "@/components/theme-config";
+import cn from "_/help/cn";
 
 import "./style/app-header.less";
 
@@ -32,11 +33,11 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggle }) => {
   return (
     <>
       <div className="app-header">
-        <div className="item-card" onClick={onToggle}>
+        <div className="icon-card" onClick={onToggle}>
           <Menu data-scale />
         </div>
         {/*  切换 全屏 */}
-        <div className="item-card ml-auto" onClick={toggleFullScreen}>
+        <div className="icon-card ml-auto" onClick={toggleFullScreen}>
           {isFullScreen ? (
             <Minimize size={20} data-scale />
           ) : (
@@ -44,22 +45,26 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggle }) => {
           )}
         </div>
         {/* 消息通知 */}
-        <div className="item-card">
+        <div className="icon-card">
           <i className="pi pi-bell p-overlay-badge text-xl" data-scale>
             <Badge severity="danger"></Badge>
           </i>
         </div>
-        <div className="item-card relative" onClick={toggleMode}>
+        <div className="icon-card relative" onClick={toggleMode}>
           {mode === "light" ? (
             <Moon size={20} data-scale />
           ) : (
             <Sun size={20} data-scale />
           )}
         </div>
-        <div className="item-card" onClick={() => setVisible(true)}>
-          <Palette size={20} data-scale />
+        <div className="icon-card palette" onClick={() => setVisible(true)}>
+          <Palette
+            className="text-neutral-50 dark:text-neutral-800"
+            size={20}
+            data-scale
+          />
         </div>
-        <div className="item-card">
+        <div className="icon-card">
           <Avatar data-scale image="/amyelsner.png" shape="circle" />
         </div>
       </div>

@@ -27,3 +27,34 @@
     height: 0%;
   }
 }
+
+
+
+.icon-card {
+  @apply size-10 flex text-neutral-950 dark:text-neutral-200 items-center justify-center cursor-pointer rounded-full;
+
+  will-change: background-color;
+  transition: background-color 0.2s var(--app-bezier);
+
+  & > [data-scale] {
+    will-change: transform;
+    transition: transform 0.2s var(--app-bezier);
+  }
+
+  &:hover {
+    @apply bg-neutral-200 dark:bg-neutral-600;
+
+    & > [data-scale] {
+      @apply scale-90;
+    }
+  }
+
+  &:active {
+    @apply bg-neutral-300;
+
+    & > [data-scale] {
+      @apply scale-95;
+    }
+  }
+
+}
