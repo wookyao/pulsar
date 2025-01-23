@@ -30,3 +30,43 @@ export function getSystemMode() {
     ? "dark"
     : "light";
 }
+
+export function changeThemeStyleFile(
+  newTheme: string,
+  linkId: string = "#theme-link"
+) {
+  // 获取指定的link标签
+  const eLink = document.querySelector(linkId) as HTMLLinkElement;
+  // 判断link 标签是否移动到指定位置
+  const hasDataMove = eLink.hasAttribute("data-moved");
+  const head = document.head;
+  if (!hasDataMove) {
+    const styleElement = document.querySelector(
+      "style[data-primereact-style-id]"
+    );
+    eLink.setAttribute("data-moved", "");
+    head.insertBefore(eLink, styleElement);
+  }
+
+  //  获取当前的主题样式文件
+  const prevLinkUrl = eLink.href;
+
+  // 创建一个新的link标签
+  let newLink = document.querySelector("#theme-link-bak") as HTMLLinkElement;
+  if (!newLink) {
+    newLink = document.createElement("link");
+    newLink.id = "theme-link-bak";
+    newLink.rel = "stylesheet";
+    head.insertBefore(newLink, eLink);
+    newLink.href = prevLinkUrl;
+  }
+
+  //  获取新的主题样式文件
+  const newLinkUrl = `/themes/${newTheme}/theme.css`;
+  newLink.href = newLinkUrl;
+
+  // 修改 link 标签的 href 属性
+  setTimeout(() => {
+    eLink.href = newLinkUrl;
+  }, 300);
+}
