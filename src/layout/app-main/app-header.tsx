@@ -5,8 +5,6 @@ import { Badge } from "primereact/badge";
 import toggleFullScreen from "_/help/full-screen";
 import { useToggleTheme } from "_/hooks/use-theme";
 import ThemeConfig from "@/components/theme-config";
-import cn from "_/help/cn";
-
 import "./style/app-header.less";
 
 interface AppHeaderProps {
