@@ -66,8 +66,7 @@ const AppMain = () => {
         </div>
 
         {/* user info  */}
-
-        <div className="mx-4 rounded-2xl px-2 py-2 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-600">
+        <div className="mx-4 rounded-2xl px-3 py-4 flex items-center gap-2 bg-neutral-100 dark:bg-neutral-600 mb-3">
           <div className="size-12 overflow-hidden rounded-full">
             <img
               src="/amyelsner.png"
@@ -75,8 +74,8 @@ const AppMain = () => {
               style={{ width: "100%", height: "100%" }}
             />
           </div>
-          <div className="flex-1 ">
-            <h4 className="text-neutral-900 dark:text-neutral-100 text-sm pb-1">
+          <div className="flex-1">
+            <h4 className="text-lg text-neutral-900 dark:text-neutral-100 pb-1">
               {user?.account || "Pulsar OA"}
             </h4>
             <h5 className="text-xs text-neutral-500 dark:text-neutral-300">
