@@ -5,6 +5,7 @@ import App from "./App.tsx";
 
 import ThemeProvider from "_/provider/theme-provider.tsx";
 import { getSystemMode } from "_/help/index.ts";
+import "virtual:svg-icons-register";
 import "@/common/styles/index.css";
 import "primeicons/primeicons.css";
 import "@/common/styles/home.less";

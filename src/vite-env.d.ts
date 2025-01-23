@@ -7,3 +7,5 @@ interface ImportMetaEnv {
   readonly VITE_PORT: string;
   readonly VITE_ROUTER_BASE: string;
 }
+
+declare module "virtual:svg-icons-register";

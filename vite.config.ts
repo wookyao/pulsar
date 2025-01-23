@@ -3,6 +3,7 @@ import { ConfigEnv, defineConfig, loadEnv } from "vite";
 import autoprefixer from "autoprefixer";
 import tailwindcss from "tailwindcss";
 import react from "@vitejs/plugin-react";
+import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
@@ -14,7 +15,13 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         plugins: [tailwindcss, autoprefixer],
       },
     },
-    plugins: [react()],
+    plugins: [
+      react(),
+      createSvgIconsPlugin({
+        iconDirs: [path.resolve(process.cwd(), "src/common/svg")],
+        symbolId: "icon-[dir]-[name]",
+      }),
+    ],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

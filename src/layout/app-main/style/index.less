@@ -2,7 +2,6 @@
 
 .app-main {
 
-  --side-bar-width: var(--app-sidebar-width);
 
   @apply h-screen w-screen overflow-hidden relative;
   background-color: var(--app-surface-ground);
@@ -23,24 +22,37 @@
 
 
   &__sidebar {
-    @apply absolute left-0 top-0 bottom-0;
+    @apply fixed  md:absolute z-[9999];
+    @apply left-0 top-0 bottom-0;
     @apply bg-white dark:bg-neutral-950 rounded-e-3xl overflow-hidden;
-
+    @apply w-full md:w-60;
+    
     visibility: visible;
-    width: var(--side-bar-width, 240px);
 
     will-change: transform, visibility;
     transition: transform .4s var(--app-bezier), visibility .4s var(--app-bezier);
+
+
+    .logo-area {
+      @apply flex items-center px-4;
+
+      height: var(--app-header-height, 64px);
+    }
   }
 
   &__content {
     @apply block relative h-screen overflow-auto;
 
-    margin-left: var(--side-bar-width, 240px);
+    @apply ml-0 md:ml-60;
 
 
     will-change: margin-left;
     transition: margin-left .4s var(--app-bezier);
+  }
+
+  &__stage {
+    @apply relative px-4 py-3 overflow-y-auto;
+    min-height: calc(100vh - var(--app-header-height, 64px));
   }
 
 }
