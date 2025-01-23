@@ -10,7 +10,15 @@ const LayImport: FC<LazyImportProps> = ({ lazy }) => {
   const Component = lazy ? lazy : () => null;
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-md">
+          <div className="loading font-bold text-2xl" data-text="PULSAR OA">
+            PULSAR OA
+          </div>
+        </div>
+      }
+    >
       <Component />
     </Suspense>
   );

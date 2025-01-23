@@ -7,6 +7,7 @@ import ThemeProvider from "_/provider/theme-provider.tsx";
 import { getSystemMode } from "_/help/index.ts";
 import "@/common/styles/index.css";
 import "primeicons/primeicons.css";
+import "@/common/styles/home.less";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

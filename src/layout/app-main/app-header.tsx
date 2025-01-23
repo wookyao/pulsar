@@ -4,7 +4,7 @@ import { Avatar } from "primereact/avatar";
 import { Badge } from "primereact/badge";
 import toggleFullScreen from "_/help/full-screen";
 import { useToggleTheme } from "_/hooks/use-theme";
-import AppConfig from "./app-config.tsx";
+import ThemeConfig from "@/components/theme-config";
 
 import "./style/app-header.less";
 
@@ -64,7 +64,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onToggle }) => {
         </div>
       </div>
 
-      <AppConfig visible={visible} setVisible={setVisible} />
+      <ThemeConfig visible={visible} setVisible={setVisible} />
     </>
   );
 };
